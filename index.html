@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="data:;base64,=" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ArcGIS Maps SDK for JavaScript Tutorials: Create a web app using components</title>
+    <title>UAkron Smart Park</title>
   </head>
   <body>
 
@@ -13,11 +13,16 @@
         <calcite-navigation-logo slot="logo"></calcite-navigation-logo>
       </calcite-navigation>
 
-      <arcgis-map item-id="e691172598f04ea8881cd2a4adaa45ba" zoom="4">
-        <arcgis-zoom slot="top-left"></arcgis-zoom>
-        <arcgis-layer-list slot="top-right"></arcgis-layer-list>
+      <!-- Map -->
+      <arcgis-map
+        basemap="arcgis/navigation"
+        center="-81.5115,41.0736"
+        zoom="16"
+      >
+        <arcgis-zoom position="top-left"></arcgis-zoom>
+        <arcgis-legend position="bottom-right"></arcgis-legend>
       </arcgis-map>
-      
+
     </calcite-shell>
 
     <script type="module" src="/main.js"></script>

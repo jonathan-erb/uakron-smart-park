@@ -1,41 +1,62 @@
+import esriConfig from "@arcgis/core/config.js";
+
+esriConfig.apiKey = import.meta.env.VITE_API_KEY;
+if (!esriConfig.apiKey) {
+  console.error(
+    "Missing VITE_API_KEY."
+  );
+}
+
 import "./style.css";
 
-import "@arcgis/map-components/components/arcgis-layer-list";
-import "@arcgis/map-components/components/arcgis-map";
-import "@arcgis/map-components/components/arcgis-zoom";
+import { defineCustomElements as defineMapElements } from "@arcgis/map-components/dist/loader";
+import { defineCustomElements as defineCalciteElements } from "@esri/calcite-components/dist/loader";
 
-import "@esri/calcite-components/components/calcite-navigation";
-import "@esri/calcite-components/components/calcite-navigation-logo";
-import "@esri/calcite-components/components/calcite-shell";
-
-// Get a reference to the arcgis-layer-list element
-const arcgisLayerList = document.querySelector("arcgis-layer-list");
-
-// Set the listItemCreatedFunction to add a legend to each list item
-arcgisLayerList.listItemCreatedFunction = (event) => {
-  const { item } = event;
-  if (item.layer.type !== "group") {
-    item.panel = {
-      content: "legend",
-    };
-  }
-};
-
-// Get a reference to the arcgis-map element
-const viewElement = document.querySelector("arcgis-map");
-
-// Wait for the map component to be ready before accessing its properties.
-viewElement.addEventListener("arcgisViewReadyChange", () => {
-
-  const { portalItem } = viewElement.map;
-
-  const navigationLogo = document.querySelector("calcite-navigation-logo");
-  navigationLogo.heading = portalItem.title;
-  navigationLogo.description = portalItem.snippet;
-  navigationLogo.thumbnail = portalItem.thumbnailUrl;
-
-  const layer = viewElement.map.layers.find((layer) => layer.id === "Accidental_Deaths_8938");
-
-  layer.popupTemplate.title = "Accidental Deaths";
-
+defineMapElements(window, {
+  resourcesUrl: "https://js.arcgis.com/map-components/4.34/assets"
 });
+
+defineCalciteElements(window, {
+  resourcesUrl: "https://js.arcgis.com/calcite-components/2.13.2/assets"
+});
+
+customElements.whenDefined("arcgis-map").then(() => {
+  console.log("ArcGIS Map components loaded");
+  initializeApp();
+});
+
+import { parkingLots, buildings } from "./src/parkingData.js";
+import { createParkingLayer, createBuildingsLayer, addLayersToMap } from "./src/layers.js";
+import { initializeUI } from "./src/ui.js";
+
+function initializeApp() {
+  const arcgisMapElement = document.querySelector("arcgis-map");
+
+  if (!arcgisMapElement) {
+    console.error("arcgis-map element not found");
+    return;
+  }
+
+  arcgisMapElement.addEventListener("arcgisViewReadyChange", (event) => {
+    console.log("Map view is ready");
+
+    const navigationLogo = document.querySelector("calcite-navigation-logo");
+    if (navigationLogo) {
+      navigationLogo.heading = "UAkron Smart Park";
+      navigationLogo.description = "Find parking on campus";
+    }
+
+    console.log("Map:", arcgisMapElement.map);
+    console.log("View:", arcgisMapElement.view);
+    console.log("");
+    
+    console.log("🎯 Loading full parking finder...");
+    
+    const parkingLayer = createParkingLayer(parkingLots);
+    // const buildingsLayer = createBuildingsLayer(buildings);
+    addLayersToMap(arcgisMapElement, [parkingLayer]);
+    
+    initializeUI(arcgisMapElement, parkingLots, buildings);
+
+  });
+}

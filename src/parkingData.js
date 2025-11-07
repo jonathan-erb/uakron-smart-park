@@ -1,0 +1,326 @@
+/**
+ * 
+ * REFERENCES:
+ * - GeoJSON specification: https://geojson.org/
+ * - FeatureLayer (for live data): https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-FeatureLayer.html
+ * - Query features: https://developers.arcgis.com/javascript/latest/query-feature-data/
+ * - REST API example: https://developers.arcgis.com/javascript/latest/query-data-from-feature-service/
+ */
+
+export const parkingLots = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.50545851532486, 41.07590978852686]
+      },
+      properties: {
+        id: "lot-1",
+        name: "Lot 1",
+        type: "surface",
+        totalSpaces: 100,
+        availableSpaces: 60, // Simulated - replace with real data later
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51032, 41.07828]
+      },
+      properties: {
+        id: "lot-24",
+        name: "Lot 24",
+        type: "surface",
+        totalSpaces: 150,
+        availableSpaces: 85, // Simulated - replace with real data later
+        permitTypes: ["Student", "Faculty", "Staff", "Commuter", "Overnight"],
+        hourlyRate: 1.00,
+        description: "Surface lot - All permit types including overnight commuter parking"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51373003906953, 41.078686584819316]
+      },
+      properties: {
+        id: "lot-27",
+        name: "Lot 27",
+        type: "surface",
+        totalSpaces: 120,
+        availableSpaces: 70, // Simulated - replace with real data later
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51633905590212, 41.07596513524043]
+      },
+      properties: {
+        id: "lot-34",
+        name: "Lot 34",
+        type: "surface",
+        totalSpaces: 100,
+        availableSpaces: 55, // Simulated - replace with real data later
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51465919902684, 41.07408193139396]
+      },
+      properties: {
+        id: "lot-36",
+        name: "Lot 36 (South Campus Parking Deck)",
+        type: "garage",
+        totalSpaces: 450,
+        availableSpaces: 220, // Simulated - replace with real data later
+        permitTypes: ["Student", "Faculty", "Staff", "Visitor"],
+        hourlyRate: 2.00,
+        description: "Multi-level parking deck on south campus"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.50796, 41.07709] 
+      },
+      properties: {
+        id: "lot-15",
+        name: "Lot 15",
+        type: "surface",
+        totalSpaces: 25,
+        availableSpaces: 10,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface lot near Olin Hall"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.50666, 41.07474] // Lot 8 - Near Recreation Center & Ocasek Natatorium
+      },
+      properties: {
+        id: "lot-8",
+        name: "Lot 8",
+        type: "surface",
+        totalSpaces: 80, // Estimate - update with actual capacity
+        availableSpaces: 45, // Simulated - replace with real data later
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface lot near Recreation Center and Ocasek Natatorium"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.50750, 41.07556] // Lot 3 - Fir-Hill lot near James Rhodes
+      },
+      properties: {
+        id: "lot-3",
+        name: "Lot 3 (Fir-Hill)",
+        type: "surface",
+        totalSpaces: 100,
+        availableSpaces: 55,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Fir-Hill lot near James Rhodes area"
+      }
+    },
+    
+    // {
+    //   type: "Feature",
+    //   geometry: {
+    //     type: "Point",
+    //     coordinates: [-81.5085, 41.0750] // South Parking Deck 
+    //   },
+    //   properties: {
+    //     id: "lot-south-deck",
+    //     name: "South Parking Deck",
+    //     type: "garage",
+    //     totalSpaces: 450,
+    //     availableSpaces: 120,
+    //     permitTypes: ["Student", "Faculty"],
+    //     hourlyRate: 2.00,
+    //     description: "Multi-level parking deck near student center "
+    //   }
+    // },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51268936692537, 41.07870567073899] // North Parking Lot
+      },
+      properties: {
+        id: "lot-north",
+        name: "North Parking Lot",
+        totalSpaces: 200,
+        availableSpaces: 45,
+        permitType: "Faculty/Staff",
+        hourlyRate: 3.00,
+        description: "Surface lot near College of Engineering"
+      }
+    },
+    // {
+    //   type: "Feature",
+    //   geometry: {
+    //     type: "Point",
+    //     coordinates: [-81.5095, 41.0720] // Exchange Street Deck
+    //   },
+    //   properties: {
+    //     id: "lot-exchange",
+    //     name: "Exchange Street Deck",
+    //     totalSpaces: 600,
+    //     availableSpaces: 280,
+    //     permitType: "Student/Visitor",
+    //     hourlyRate: 1.50,
+    //     description: "Large parking deck with visitor access"
+    //   }
+    // },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5140, 41.0745] // West Campus Lot
+      },
+      properties: {
+        id: "lot-west",
+        name: "West Campus Lot",
+        totalSpaces: 150,
+        availableSpaces: 12,
+        permitType: "Student",
+        hourlyRate: 1.00,
+        description: "Economy parking for students"
+      }
+    },
+    // },
+    // {
+    //   type: "Feature",
+    //   geometry: {
+    //     type: "Point",
+    //     coordinates: [-81.5100, 41.0780] // Athletic Lot 41.074743100522035, -81.50666468321636
+    //   },
+    //   properties: {
+    //     id: "lot-athletic",
+    //     name: "Athletic Complex Lot",
+    //     totalSpaces: 300,
+    //     availableSpaces: 185,
+    //     permitType: "Event/Student",
+    //     hourlyRate: 2.50,
+    //     description: "Parking for athletic events and recreation center"
+    //   }
+    // }
+  ]
+};
+
+/**
+ * Sample building/destination data for University of Akron campus
+ */
+export const buildings = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5105, 41.0745]
+      },
+      properties: {
+        id: "bldg-student-union",
+        name: "Student Union",
+        category: "Student Services",
+        description: "Main student center and dining"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5115, 41.0760]
+      },
+      properties: {
+        id: "bldg-engineering",
+        name: "College of Engineering",
+        category: "Academic",
+        description: "Engineering classrooms and labs"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5090, 41.0735]
+      },
+      properties: {
+        id: "bldg-library",
+        name: "Bierce Library",
+        category: "Academic",
+        description: "Main campus library"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5120, 41.0775]
+      },
+      properties: {
+        id: "bldg-rec-center",
+        name: "Student Recreation Center",
+        category: "Recreation",
+        description: "Fitness and wellness facility"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5095, 41.0725]
+      },
+      properties: {
+        id: "bldg-business",
+        name: "College of Business",
+        category: "Academic",
+        description: "Business school and classrooms"
+      }
+    }
+  ]
+};
+
+/**
+ * Get available parking lots (those with spaces available)
+ */
+export function getAvailableParkingLots() {
+  return parkingLots.features.filter(
+    (lot) => lot.properties.availableSpaces > 0
+  );
+}
+
+/**
+ * Update parking lot availability (simulate real-time updates)
+ */
+export function updateParkingAvailability(lotId, availableSpaces) {
+  const lot = parkingLots.features.find((f) => f.properties.id === lotId);
+  if (lot) {
+    lot.properties.availableSpaces = availableSpaces;
+  }
+}

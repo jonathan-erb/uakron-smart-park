@@ -1,1 +1,4 @@
 node_modules
+
+# Local env for Vite - keep API keys out of repo
+.env.local
