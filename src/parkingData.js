@@ -21,7 +21,24 @@ export const parkingLots = {
         name: "Lot 1",
         type: "surface",
         totalSpaces: 100,
-        availableSpaces: 60, // Simulated - replace with real data later
+        availableSpaces: 60,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5076615116506, 41.07628804817283]
+      },
+      properties: {
+        id: "lot-4",
+        name: "Lot 4",
+        type: "surface",
+        totalSpaces: 90,
+        availableSpaces: 55,
         permitTypes: ["Student", "Faculty", "Staff"],
         hourlyRate: 1.00,
         description: "Surface parking lot"
@@ -72,7 +89,160 @@ export const parkingLots = {
         name: "Lot 34",
         type: "surface",
         totalSpaces: 100,
-        availableSpaces: 55, // Simulated - replace with real data later
+        availableSpaces: 55,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5081595864345, 41.07788820563801]
+      },
+      properties: {
+        id: "lot-14",
+        name: "Lot 14",
+        type: "surface",
+        totalSpaces: 80,
+        availableSpaces: 50,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5075957542346, 41.07739872678952]
+      },
+      properties: {
+        id: "lot-3",
+        name: "Lot 3",
+        type: "surface",
+        totalSpaces: 100,
+        availableSpaces: 60,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.50690034661366, 41.074034050634694]
+      },
+      properties: {
+        id: "lot-10",
+        name: "Lot 10",
+        type: "surface",
+        totalSpaces: 90,
+        availableSpaces: 45,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.5097192974674, 41.07273304327922]
+      },
+      properties: {
+        id: "lot-6",
+        name: "Lot 6",
+        type: "surface",
+        totalSpaces: 70,
+        availableSpaces: 35,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.50696428593399, 41.07160060144943]
+      },
+      properties: {
+        id: "lot-9",
+        name: "Lot 9",
+        type: "surface",
+        totalSpaces: 85,
+        availableSpaces: 50,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51857998841692, 41.073340813759785]
+      },
+      properties: {
+        id: "lot-47",
+        name: "Lot 47",
+        type: "surface",
+        totalSpaces: 85,
+        availableSpaces: 50,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface lot near Folk Hall"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51919994439982, 41.07760942164629]
+      },
+      properties: {
+        id: "lot-49",
+        name: "Lot 49",
+        type: "surface",
+        totalSpaces: 95,
+        availableSpaces: 55,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51683373354226, 41.07350393577061]
+      },
+      properties: {
+        id: "lot-46",
+        name: "Lot 46",
+        type: "surface",
+        totalSpaces: 75,
+        availableSpaces: 40,
+        permitTypes: ["Student", "Faculty", "Staff"],
+        hourlyRate: 1.00,
+        description: "Surface parking lot"
+      }
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [-81.51616529124898, 41.07224923684701]
+      },
+      properties: {
+        id: "lot-44",
+        name: "Lot 44",
+        type: "surface",
+        totalSpaces: 80,
+        availableSpaces: 45,
         permitTypes: ["Student", "Faculty", "Staff"],
         hourlyRate: 1.00,
         description: "Surface parking lot"
