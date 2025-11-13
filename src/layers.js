@@ -14,7 +14,7 @@
 import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer.js";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol.js";
 import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer.js";
-import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer.js";
+import ClassBreaksRenderer from "@arcgis/core/renderers/ClassBreaksRenderer.js";
 import PopupTemplate from "@arcgis/core/PopupTemplate.js";
 
 /**
@@ -29,27 +29,45 @@ export function createParkingLayer(geojsonData) {
   });
   const url = URL.createObjectURL(blob);
 
-  // (all simulate dfor now)
-  const renderer = new UniqueValueRenderer({
+  // Color-coded renderer based on available spaces
+  const renderer = new ClassBreaksRenderer({
     field: "availableSpaces",
-    defaultSymbol: new SimpleMarkerSymbol({
-      style: "circle",
-      color: [200, 200, 200, 0.8],
-      size: "14px",
-      outline: {
-        color: [50, 50, 50],
-        width: 2
-      }
-    }),
-    visualVariables: [
+    legendOptions: {
+      title: "Available Spaces"
+    },
+    classBreakInfos: [
       {
-        type: "color",
-        field: "availableSpaces",
-        stops: [
-          { value: 0, color: [220, 50, 50, 0.9], label: "Full" },
-          { value: 50, color: [255, 165, 0, 0.9], label: "Limited" },
-          { value: 100, color: [50, 200, 50, 0.9], label: "Available" }
-        ]
+        minValue: 0,
+        maxValue: 25,
+        symbol: new SimpleMarkerSymbol({
+          style: "circle",
+          color: [220, 50, 50, 0.9],
+          size: "14px",
+          outline: { color: [50, 50, 50], width: 2 }
+        }),
+        label: "Full"
+      },
+      {
+        minValue: 26,
+        maxValue: 75,
+        symbol: new SimpleMarkerSymbol({
+          style: "circle",
+          color: [255, 165, 0, 0.9],
+          size: "14px",
+          outline: { color: [50, 50, 50], width: 2 }
+        }),
+        label: "Limited"
+      },
+      {
+        minValue: 76,
+        maxValue: 500,
+        symbol: new SimpleMarkerSymbol({
+          style: "circle",
+          color: [50, 200, 50, 0.9],
+          size: "14px",
+          outline: { color: [50, 50, 50], width: 2 }
+        }),
+        label: "Available"
       }
     ]
   });
@@ -79,6 +97,7 @@ export function createParkingLayer(geojsonData) {
     title: "Parking Lots",
     renderer,
     popupTemplate,
+    legendEnabled: true,
     // Store the original data for queries
     customParameters: {
       geojsonData

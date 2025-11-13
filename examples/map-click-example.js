@@ -13,7 +13,7 @@
  * - Click event: https://developers.arcgis.com/javascript/latest/api-reference/esri-views-MapView.html#event-click
  * - Graphic class: https://developers.arcgis.com/javascript/latest/api-reference/esri-Graphic.html
  * - GraphicsLayer: https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-GraphicsLayer.html
- * - Tutorial: https://developers.arcgis.com/javascript/latest/add-point-line-polygon/
+ * - Tutorial: https://developers.arcgis.com/javascript/latest/tutorials/add-a-point-line-and-polygon/
  */
 
 import Graphic from "@arcgis/core/Graphic.js";

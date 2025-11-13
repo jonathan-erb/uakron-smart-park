@@ -18,7 +18,8 @@ import {
   getTopNearestParkingLots,
   createDestinationGraphic,
   createParkingGraphic,
-  createRouteGraphic
+  createRouteGraphic,
+  calculateWalkingTime
 } from "./parkingFinder.js";
 
 let highlightLayer = null;
@@ -165,8 +166,6 @@ function findParkingForDestination(
   // Clear previous highlights
   highlightLayer.removeAll();
 
-
-  // @TODO need to fix the parking deck data and location point
   // Store current destination
   currentDestination = {
     point: destinationPoint,
@@ -189,6 +188,7 @@ function findParkingForDestination(
   const [lon, lat] = result.lot.geometry.coordinates;
   const parkingPoint = new Point({ longitude: lon, latitude: lat });
 
+  // Use straight line for campus navigation (more accurate than road routing)
   const routeGraphic = createRouteGraphic(parkingPoint, destinationPoint);
 
   // Add to map
@@ -217,25 +217,24 @@ function displayResults(result, arcgisMapElement) {
     return;
   }
 
-  const walkingTime = Math.round((result.distance / 1609.34) * 20); // ~3mph = 20 min/mile
+  const walkingTime = calculateWalkingTime(result.distance);
+  const distance = result.distanceInFeet;
 
   panel.innerHTML = `
-    <calcite-panel heading="Parking Recommendation" closable>
-      <calcite-notice open icon="parking" kind="success">
-        <div slot="title">Best Option Found</div>
-        <div slot="message">
-          ${result.lot.properties.name} - ${result.distanceInFeet} feet away
-        </div>
-      </calcite-notice>
+    <calcite-panel heading="Parking Recommendation" closable collapsed="false">
+      <div style="padding: 16px; padding-bottom: 0;">
+        <calcite-notice open icon="parking" kind="success">
+          <div slot="title">Best Option Found</div>
+          <div slot="message">
+            ${result.lot.properties.name}
+          </div>
+        </calcite-notice>
+      </div>
 
       <div style="padding: 16px;">
-        <calcite-label>
-          <strong>${result.lot.properties.name}</strong>
-        </calcite-label>
-        
-        <div style="margin-top: 12px;">
+        <div style="margin-bottom: 12px;">
           <calcite-chip icon="walking" kind="neutral">
-            ${result.distanceInFeet} ft (~${walkingTime} min walk)
+            ${distance} ft (~${walkingTime} min walk)
           </calcite-chip>
         </div>
 
@@ -249,16 +248,31 @@ function displayResults(result, arcgisMapElement) {
           <p style="font-size: 13px; color: #666;">
             ${result.lot.properties.description}
           </p>
+          <p style="font-size: 12px; color: #999; margin-top: 8px; font-style: italic;">
+            * Distance and time are straight-line estimates
+          </p>
         </div>
       </div>
 
       <calcite-button slot="footer" width="full" id="get-directions-btn">
-        Get Directions
+        Open in Google Maps
       </calcite-button>
     </calcite-panel>
   `;
 
   panel.style.display = "block";
+  
+  // Ensure panel is expanded (not collapsed)
+  const panelElement = panel.querySelector('calcite-panel');
+  if (panelElement) {
+    panelElement.collapsed = false;
+    
+    // Handle panel close event
+    panelElement.addEventListener('calcitePanelClose', () => {
+      panel.style.display = "none";
+      clearResults();
+    }, { once: true });
+  }
 
   // Handle directions button
   const directionsBtn = document.getElementById("get-directions-btn");
@@ -307,6 +321,82 @@ function openDirections(parkingLot, destination) {
   const url = `https://www.google.com/maps/dir/?api=1&origin=${parkLat},${parkLon}&destination=${destLat},${destLon}&travelmode=walking`;
   window.open(url, "_blank");
 }
+
+/**
+ * Show turn-by-turn directions in the panel
+ * @param {Object} routeInfo - Route information from routing service
+ * @param {Object} parkingLot - Parking lot feature
+ */
+function showTurnByTurnDirections(routeInfo, parkingLot) {
+  const panel = document.getElementById("info-panel");
+  if (!panel) return;
+
+  const directionsHTML = routeInfo.features.map((step, index) => {
+    return `
+      <div style="padding: 8px; border-bottom: 1px solid #eee;">
+        <div style="display: flex; align-items: start; gap: 8px;">
+          <calcite-icon icon="navigation" scale="s"></calcite-icon>
+          <div>
+            <strong>${index + 1}.</strong> ${step.attributes.text}
+            <div style="font-size: 12px; color: #666; margin-top: 4px;">
+              ${Math.round(step.attributes.length)} ft
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  panel.innerHTML = `
+    <calcite-panel heading="Walking Directions" closable>
+      <calcite-action slot="header-actions-end" icon="x" text="Close" id="close-directions"></calcite-action>
+      
+      <div style="padding: 16px; background: #f8f8f8; border-bottom: 2px solid #0079c1;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <calcite-icon icon="walking" scale="m"></calcite-icon>
+            <strong>${Math.round(routeInfo.totalDistance)} ft</strong>
+          </div>
+          <div>
+            <calcite-icon icon="clock" scale="m"></calcite-icon>
+            <strong>${Math.round(routeInfo.totalTime)} min</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="max-height: 400px; overflow-y: auto;">
+        ${directionsHTML}
+      </div>
+
+      <calcite-button slot="footer" width="full" id="back-to-summary-btn">
+        Back to Summary
+      </calcite-button>
+    </calcite-panel>
+  `;
+
+  // Handle back button
+  const backBtn = document.getElementById("back-to-summary-btn");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      // Re-display the summary with the route info
+      const result = {
+        lot: parkingLot,
+        distance: routeInfo.totalDistance / 3.28084, // convert feet to meters
+        distanceInFeet: Math.round(routeInfo.totalDistance)
+      };
+      displayResults(result, null, routeInfo);
+    });
+  }
+
+  // Handle close button
+  const closeBtn = document.getElementById("close-directions");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      panel.style.display = "none";
+    });
+  }
+}
+
 
 /**
  * Clear all highlights and results

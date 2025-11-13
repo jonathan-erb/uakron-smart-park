@@ -8,14 +8,19 @@
  * - Polyline geometry: https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polyline.html
  * - Graphic class: https://developers.arcgis.com/javascript/latest/api-reference/esri-Graphic.html
  * - Symbols guide: https://developers.arcgis.com/javascript/latest/visualization-symbols/
+ * - Route Service: https://developers.arcgis.com/javascript/latest/api-reference/esri-rest-route.html
  */
 
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine.js";
+import * as route from "@arcgis/core/rest/route.js";
+import RouteParameters from "@arcgis/core/rest/support/RouteParameters.js";
+import FeatureSet from "@arcgis/core/rest/support/FeatureSet.js";
 import Point from "@arcgis/core/geometry/Point.js";
 import Graphic from "@arcgis/core/Graphic.js";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol.js";
 import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol.js";
 import Polyline from "@arcgis/core/geometry/Polyline.js";
+import esriConfig from "@arcgis/core/config.js";
 
 /**
  * Find the nearest available parking lot to a destination point
@@ -219,4 +224,83 @@ export function getTopNearestParkingLots(destinationPoint, parkingGeoJSON, topN 
   return lotsWithDistance
     .sort((a, b) => a.distance - b.distance)
     .slice(0, topN);
+}
+
+/**
+ * Get walking directions using ArcGIS Route Service
+ * @param {Point} parkingPoint - Starting point (parking lot)
+ * @param {Point} destinationPoint - End point (destination)
+ * @returns {Promise<Object>} - Route result with directions and geometry
+ */
+export async function getWalkingDirections(parkingPoint, destinationPoint) {
+  const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+  
+  // Ensure points have proper spatial reference
+  const stop1 = new Point({
+    longitude: parkingPoint.longitude,
+    latitude: parkingPoint.latitude,
+    spatialReference: { wkid: 4326 }
+  });
+  
+  const stop2 = new Point({
+    longitude: destinationPoint.longitude,
+    latitude: destinationPoint.latitude,
+    spatialReference: { wkid: 4326 }
+  });
+  
+  const routeParams = new RouteParameters({
+    stops: new FeatureSet({
+      features: [
+        new Graphic({ geometry: stop1 }),
+        new Graphic({ geometry: stop2 })
+      ]
+    }),
+    returnDirections: true,
+    directionsLanguage: "en",
+    directionsLengthUnits: "feet",
+    outSpatialReference: { wkid: 4326 }
+  });
+
+  try {
+    const result = await route.solve(routeUrl, routeParams, {
+      apiKey: esriConfig.apiKey
+    });
+    
+    if (result.routeResults.length > 0) {
+      const routeResult = result.routeResults[0];
+      
+      return {
+        route: routeResult.route,
+        directions: routeResult.directions,
+        totalDistance: routeResult.directions.totalLength, // in feet
+        totalTime: routeResult.directions.totalTime, // in minutes
+        features: routeResult.directions.features // turn-by-turn steps
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error calculating route:", error);
+    console.error("Error details:", error.details);
+    return null;
+  }
+}
+
+/**
+ * Create a route graphic from route result
+ * @param {Object} routeGeometry - Route polyline geometry
+ * @returns {Graphic}
+ */
+export function createRouteGraphicFromService(routeGeometry) {
+  return new Graphic({
+    geometry: routeGeometry,
+    symbol: new SimpleLineSymbol({
+      color: [0, 150, 255, 0.8],
+      width: 4,
+      style: "solid"
+    }),
+    attributes: {
+      type: "walking-route"
+    }
+  });
 }

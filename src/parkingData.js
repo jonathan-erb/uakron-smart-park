@@ -22,9 +22,9 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 100,
         availableSpaces: 60,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitTypes: ["Student", "Faculty", "Staff", "Visitor"],
         hourlyRate: 1.00,
-        description: "Surface parking lot"
+        description: "Parking on outer campus"
       }
     },
     {
@@ -347,7 +347,7 @@ export const parkingLots = {
         availableSpaces: 45,
         permitType: "Faculty/Staff",
         hourlyRate: 3.00,
-        description: "Surface lot near College of Engineering"
+        description: "Mainstream parking deck near northern campus buildings, contains a bridge from second floor over to access points for the Honors College and Rob's Cafe."
       }
     },
     // {
@@ -370,16 +370,16 @@ export const parkingLots = {
       type: "Feature",
       geometry: {
         type: "Point",
-        coordinates: [-81.5140, 41.0745] // West Campus Lot
+        coordinates: [-81.5140, 41.0745]
       },
       properties: {
         id: "lot-west",
-        name: "West Campus Lot",
+        name: "Lot 37 (Schrank Hall Parking Deck)",
         totalSpaces: 150,
         availableSpaces: 12,
         permitType: "Student",
         hourlyRate: 1.00,
-        description: "Economy parking for students"
+        description: ""
       }
     },
     // },
