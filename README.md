@@ -1,4 +1,4 @@
-# Create a web app using components - (initial)
+# UAkron Smart Park
 
  **[Click here to download this directory as a ZIP file](https://esri.github.io/jsapi-resources/zips/create-a-web-app-using-components-initial.zip)**
 
@@ -11,7 +11,7 @@ Built with Swift and ArcGIS Maps SDK for Swift, featuring:
 - Native iOS performance
 - Device GPS integration
 - Offline map capabilities
-- 
+
 ## Get started
 
 The project was created using [`npm create vite`](https://vitejs.dev/guide/#scaffolding-your-first-vite-project) with the [vanilla JavaScript template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-vanilla).
