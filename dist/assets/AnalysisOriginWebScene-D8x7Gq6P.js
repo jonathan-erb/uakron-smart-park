@@ -1,0 +1,1 @@
+import{v as t,m as r,b as p,bq as o}from"./index-Cd8_p_JB.js";let e=class extends o{constructor(s){super(s),this.type="web-scene"}equals(s){return this.type===s.type}};t([r()],e.prototype,"type",void 0),e=t([p("esri.analysis.support.AnalysisOriginWebScene")],e);const i=e;export{i as p};

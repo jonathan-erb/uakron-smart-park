@@ -1,0 +1,1 @@
+import{en as t}from"./index-Cd8_p_JB.js";import{F as m}from"./Scheduler-DsbgCc7D.js";function d(e){return o=>{if(e.destroyed){const r=o(m);return t(r)?r:Promise.resolve(r)}if(e.immediate)return e.immediate.schedule(o);const i="No immediate scheduler";throw console.error(i),new Error(i)}}export{d as o};

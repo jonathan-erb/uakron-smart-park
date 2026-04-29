@@ -11,6 +11,7 @@
  * - Calcite Components: https://developers.arcgis.com/calcite-design-system/components/
  */
 
+import * as geometryEngine from "@arcgis/core/geometry/geometryEngine.js";
 import Point from "@arcgis/core/geometry/Point.js";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer.js";
 import {
@@ -19,11 +20,15 @@ import {
   createDestinationGraphic,
   createParkingGraphic,
   createRouteGraphic,
-  calculateWalkingTime
+  createRouteGraphicFromService,
+  calculateWalkingTime,
+  getWalkingDirections
 } from "./parkingFinder.js";
 
 let highlightLayer = null;
 let currentDestination = null;
+let arcgisMapElementRef = null;
+let parkingDataRef = null;
 
 /**
  * Initialize UI interactions
@@ -32,6 +37,9 @@ let currentDestination = null;
  * @param {Object} buildingsData - GeoJSON buildings data
  */
 export function initializeUI(arcgisMapElement, parkingData, buildingsData) {
+  arcgisMapElementRef = arcgisMapElement;
+  parkingDataRef = parkingData;
+
   // Create a graphics layer for highlights and routes
   highlightLayer = new GraphicsLayer({
     title: "Highlights & Routes",
@@ -48,6 +56,25 @@ export function initializeUI(arcgisMapElement, parkingData, buildingsData) {
 
   // Setup building selector dropdown if exists
   setupBuildingSelector(arcgisMapElement, parkingData, buildingsData);
+}
+
+/**
+ * Update parking data and refresh the current recommendation if needed
+ * @param {Object} newParkingData - GeoJSON FeatureCollection
+ */
+export function updateParkingData(newParkingData) {
+  if (!parkingDataRef) return;
+
+  parkingDataRef.features = newParkingData.features;
+
+  if (currentDestination && arcgisMapElementRef) {
+    findParkingForDestination(
+      currentDestination.point,
+      currentDestination.name,
+      arcgisMapElementRef,
+      parkingDataRef
+    );
+  }
 }
 
 /**
@@ -95,14 +122,78 @@ function setupMapClickHandler(arcgisMapElement, parkingData, buildingsData) {
  * @param {Object} parkingData
  */
 function setupPopupActionHandlers(arcgisMapElement, parkingData) {
-  // NOTE: With web components, popup events need to be handled differently
-  // Using watchUtils or direct event listeners on the popup element
-  // For now, this is commented out - you can add functionality via map clicks instead
-  
-  // TODO: Implement popup action handling compatible with web components
-  // See: https://developers.arcgis.com/javascript/latest/components/
-  
-  console.log("Popup action handlers - not yet implemented for web components");
+  const view = arcgisMapElement.view;
+  if (!view || !view.popup) {
+    console.warn("Popup is not available on the view yet.");
+    return;
+  }
+
+  // Check if popup supports event handling (some web components may not)
+  if (typeof view.popup.on !== "function") {
+    console.warn("Popup event handlers not supported in this environment");
+    return;
+  }
+
+  view.popup.on("trigger-action", (event) => {
+    const selectedFeature = view.popup.selectedFeature;
+    if (!selectedFeature) return;
+
+    const actionId = event.action.id;
+    const geometry = selectedFeature.geometry;
+    const attributes = selectedFeature.attributes;
+
+    const featurePoint = new Point({
+      longitude: geometry.longitude ?? geometry.x,
+      latitude: geometry.latitude ?? geometry.y,
+      spatialReference: geometry.spatialReference || { wkid: 4326 }
+    });
+
+    if (actionId === "find-parking") {
+      findParkingForDestination(
+        featurePoint,
+        attributes.name || "Selected Destination",
+        arcgisMapElement,
+        parkingData
+      );
+    }
+
+    if (actionId === "select-parking") {
+      if (!currentDestination) {
+        showNoResultsMessage(
+          "Select a destination first by clicking on a building or the map."
+        );
+        return;
+      }
+
+      const parkingFeature = {
+        geometry: {
+          coordinates: [featurePoint.longitude, featurePoint.latitude]
+        },
+        properties: attributes
+      };
+
+      const distance = geometryEngine.distance(
+        currentDestination.point,
+        featurePoint,
+        "meters"
+      );
+
+      highlightLayer.removeAll();
+      highlightLayer.addMany([
+        createParkingGraphic(parkingFeature, distance),
+        createRouteGraphic(featurePoint, currentDestination.point)
+      ]);
+
+      displayResults(
+        {
+          lot: parkingFeature,
+          distance,
+          distanceInFeet: Math.round(distance * 3.28084)
+        },
+        arcgisMapElement
+      );
+    }
+  });
 }
 
 /**
@@ -172,20 +263,23 @@ function findParkingForDestination(
     name: destinationName
   };
 
-  // Find nearest parking
-  const result = findNearestParking(destinationPoint, parkingData);
+  // Find top nearest parking lots
+  const results = getTopNearestParkingLots(destinationPoint, parkingData, 3);
 
-  if (!result) {
+  if (!results || results.length === 0) {
     showNoResultsMessage();
     return;
   }
 
-  // Create graphics
+  // Use the best result for initial display
+  const bestResult = results[0];
+
+  // Create graphics for best result
   const destGraphic = createDestinationGraphic(destinationPoint, destinationName);
-  const parkingGraphic = createParkingGraphic(result.lot, result.distance);
+  const parkingGraphic = createParkingGraphic(bestResult.lot, bestResult.distance);
 
   // Create parking lot point
-  const [lon, lat] = result.lot.geometry.coordinates;
+  const [lon, lat] = bestResult.lot.geometry.coordinates;
   const parkingPoint = new Point({ longitude: lon, latitude: lat });
 
   // Use straight line for campus navigation (more accurate than road routing)
@@ -194,8 +288,8 @@ function findParkingForDestination(
   // Add to map
   highlightLayer.addMany([routeGraphic, destGraphic, parkingGraphic]);
 
-  // Display results in info panel
-  displayResults(result, arcgisMapElement);
+  // Display results in info panel (show all results with filtering)
+  displayResults(results, arcgisMapElement, destinationName);
 
   // Zoom to show both points
   arcgisMapElement.view.goTo({
@@ -209,54 +303,81 @@ function findParkingForDestination(
  * @param {Object} result - Result from findNearestParking
  * @param {HTMLElement} arcgisMapElement
  */
-function displayResults(result, arcgisMapElement) {
+function displayResults(results, arcgisMapElement, destinationName = "Selected Location") {
   const panel = document.getElementById("info-panel");
   if (!panel) {
-    console.log("Nearest parking:", result.lot.properties.name);
-    console.log("Distance:", result.distanceInFeet, "feet");
+    console.log("Parking results:", results);
     return;
   }
 
-  const walkingTime = calculateWalkingTime(result.distance);
-  const distance = result.distanceInFeet;
+  // Handle single result (backward compatibility)
+  if (!Array.isArray(results)) {
+    results = [results];
+  }
+
+  // Get unique permit types for filtering
+  const allPermitTypes = [...new Set(results.flatMap(r => r.lot.properties.permitType.split('/')))].sort();
+
+  // Build permit type options
+  const permitOptions = allPermitTypes.map(type => `<calcite-option value="${type}">${type}</calcite-option>`).join('');
 
   panel.innerHTML = `
-    <calcite-panel heading="Parking Recommendation" closable collapsed="false">
+    <calcite-panel heading="Parking Recommendations for ${destinationName}" closable collapsed="false">
       <div style="padding: 16px; padding-bottom: 0;">
-        <calcite-notice open icon="parking" kind="success">
-          <div slot="title">Best Option Found</div>
+        <calcite-notice open icon="parking" kind="info">
+          <div slot="title">${results.length} Options Found</div>
           <div slot="message">
-            ${result.lot.properties.name}
+            Filter by permit type or select your preferred spot
           </div>
         </calcite-notice>
       </div>
 
-      <div style="padding: 16px;">
-        <div style="margin-bottom: 12px;">
-          <calcite-chip icon="walking" kind="neutral">
-            ${distance} ft (~${walkingTime} min walk)
-          </calcite-chip>
-        </div>
-
-        <div style="margin-top: 12px;">
-          <p><strong>Available Spaces:</strong> ${result.lot.properties.availableSpaces} / ${result.lot.properties.totalSpaces}</p>
-          <p><strong>Permit Type:</strong> ${result.lot.properties.permitType}</p>
-          <p><strong>Rate:</strong> $${result.lot.properties.hourlyRate}/hour</p>
-        </div>
-
-        <div style="margin-top: 12px; padding: 12px; background: #f3f3f3; border-radius: 4px;">
-          <p style="font-size: 13px; color: #666;">
-            ${result.lot.properties.description}
-          </p>
-          <p style="font-size: 12px; color: #999; margin-top: 8px; font-style: italic;">
-            * Distance and time are straight-line estimates
-          </p>
-        </div>
+      <div style="padding: 16px; padding-top: 0;">
+        <calcite-label>
+          Filter by Permit Type
+          <calcite-select id="permit-filter" placeholder="All Types">
+            <calcite-option value="">All Types</calcite-option>
+            ${permitOptions}
+          </calcite-select>
+        </calcite-label>
       </div>
 
-      <calcite-button slot="footer" width="full" id="get-directions-btn">
-        Open in Google Maps
-      </calcite-button>
+      <div id="parking-results" style="padding: 0 16px 16px 16px;">
+        ${results.map((result, index) => {
+          const walkingTime = calculateWalkingTime(result.distance);
+          const distance = result.distanceInFeet || Math.round(result.distance * 3.28084);
+          const isBest = index === 0;
+
+          return `
+            <div class="parking-result" data-permit-type="${result.lot.properties.permitType}" style="margin-bottom: 12px; padding: 12px; border: 2px solid ${isBest ? '#007ac2' : '#e0e0e0'}; border-radius: 4px; ${isBest ? 'background: #f0f8ff;' : ''}">
+              ${isBest ? '<div style="margin-bottom: 8px;"><calcite-chip icon="star" kind="brand" scale="s">Best Option</calcite-chip></div>' : ''}
+              
+              <div style="margin-bottom: 8px;">
+                <calcite-chip icon="parking" kind="neutral">
+                  ${result.lot.properties.name}
+                </calcite-chip>
+                <calcite-chip icon="walking" kind="neutral" style="margin-left: 8px;">
+                  ${distance} ft (~${walkingTime} min)
+                </calcite-chip>
+              </div>
+
+              <div style="margin-bottom: 8px;">
+                <p style="margin: 4px 0;"><strong>Available:</strong> ${result.lot.properties.availableSpaces} / ${result.lot.properties.totalSpaces}</p>
+                <p style="margin: 4px 0;"><strong>Permit:</strong> ${result.lot.properties.permitType}</p>
+                <p style="margin: 4px 0;"><strong>Rate:</strong> $${result.lot.properties.hourlyRate}/hour</p>
+              </div>
+
+              <div style="margin-bottom: 8px; padding: 8px; background: #f9f9f9; border-radius: 4px; font-size: 13px;">
+                ${result.lot.properties.description}
+              </div>
+
+              <calcite-button width="full" data-lot-id="${result.lot.properties.id}" class="select-parking-btn">
+                Select This Lot
+              </calcite-button>
+            </div>
+          `;
+        }).join('')}
+      </div>
     </calcite-panel>
   `;
 
@@ -274,11 +395,140 @@ function displayResults(result, arcgisMapElement) {
     }, { once: true });
   }
 
+  // Setup permit filtering
+  const permitFilter = document.getElementById("permit-filter");
+  const parkingResults = document.getElementById("parking-results");
+  
+  if (permitFilter && parkingResults) {
+    permitFilter.addEventListener("calciteSelectChange", (event) => {
+      const selectedPermit = event.target.value;
+      const resultElements = parkingResults.querySelectorAll('.parking-result');
+      
+      resultElements.forEach(element => {
+        const lotPermitTypes = element.dataset.permitType.split('/');
+        if (!selectedPermit || lotPermitTypes.includes(selectedPermit)) {
+          element.style.display = 'block';
+        } else {
+          element.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Setup select parking buttons
+  const selectButtons = panel.querySelectorAll('.select-parking-btn');
+  selectButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+      const lotId = event.target.dataset.lotId;
+      const selectedResult = results.find(r => r.lot.properties.id === lotId);
+      
+      if (selectedResult) {
+        // Update map graphics for selected lot
+        highlightLayer.removeAll();
+        
+        const [lon, lat] = selectedResult.lot.geometry.coordinates;
+        const parkingPoint = new Point({ longitude: lon, latitude: lat });
+        
+        highlightLayer.addMany([
+          createDestinationGraphic(currentDestination.point, currentDestination.name),
+          createParkingGraphic(selectedResult.lot, selectedResult.distance),
+          createRouteGraphic(parkingPoint, currentDestination.point)
+        ]);
+
+        // Show directions for selected lot
+        showDirectionsPanel(selectedResult, arcgisMapElement);
+      }
+    });
+  });
+}
+
+/**
+ * Show directions panel for selected parking lot
+ */
+function showDirectionsPanel(result, arcgisMapElement) {
+  const panel = document.getElementById("info-panel");
+  if (!panel) return;
+
+  const walkingTime = calculateWalkingTime(result.distance);
+  const distance = result.distanceInFeet || Math.round(result.distance * 3.28084);
+
+  panel.innerHTML = `
+    <calcite-panel heading="Directions to ${result.lot.properties.name}" closable collapsed="false">
+      <div style="padding: 16px;">
+        <calcite-notice open icon="parking" kind="success">
+          <div slot="title">Selected Parking Lot</div>
+          <div slot="message">
+            ${result.lot.properties.name} - ${distance} ft (~${walkingTime} min walk)
+          </div>
+        </calcite-notice>
+        
+        <div style="margin-top: 16px;">
+          <p><strong>Available Spaces:</strong> ${result.lot.properties.availableSpaces} / ${result.lot.properties.totalSpaces}</p>
+          <p><strong>Permit Type:</strong> ${result.lot.properties.permitType}</p>
+          <p><strong>Rate:</strong> $${result.lot.properties.hourlyRate}/hour</p>
+        </div>
+
+        <div style="margin-top: 16px; padding: 12px; background: #f3f3f3; border-radius: 4px;">
+          <p style="font-size: 13px; color: #666;">
+            ${result.lot.properties.description}
+          </p>
+        </div>
+      </div>
+
+      <calcite-button slot="footer-start" width="half" id="back-to-results-btn">
+        Back to Results
+      </calcite-button>
+      <calcite-button slot="footer-end" width="half" id="get-directions-btn" kind="brand">
+        Get Walking Directions
+      </calcite-button>
+    </calcite-panel>
+  `;
+
+  // Handle back to results button
+  const backBtn = document.getElementById("back-to-results-btn");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      // Re-show the results panel
+      const allResults = getTopNearestParkingLots(currentDestination.point, parkingDataRef, 3);
+      displayResults(allResults, arcgisMapElement, currentDestination.name);
+    });
+  }
+
   // Handle directions button
   const directionsBtn = document.getElementById("get-directions-btn");
   if (directionsBtn) {
-    directionsBtn.addEventListener("click", () => {
-      openDirections(result.lot, currentDestination);
+    directionsBtn.addEventListener("click", async () => {
+      directionsBtn.disabled = true;
+      directionsBtn.textContent = "Calculating route...";
+
+      const [lotLon, lotLat] = result.lot.geometry.coordinates;
+      const parkingPoint = new Point({
+        longitude: lotLon,
+        latitude: lotLat,
+        spatialReference: { wkid: 4326 }
+      });
+
+      const routeInfo = await getWalkingDirections(
+        parkingPoint,
+        currentDestination.point
+      );
+
+      directionsBtn.disabled = false;
+      directionsBtn.textContent = "Get Walking Directions";
+
+      if (routeInfo && routeInfo.route) {
+        if (highlightLayer) {
+          highlightLayer.removeAll();
+          highlightLayer.addMany([
+            createRouteGraphicFromService(routeInfo.route.geometry ?? routeInfo.route),
+            createDestinationGraphic(currentDestination.point, currentDestination.name),
+            createParkingGraphic(result.lot, result.distance)
+          ]);
+        }
+        showTurnByTurnDirections(routeInfo, result.lot);
+      } else {
+        openDirections(result.lot, currentDestination);
+      }
     });
   }
 }
@@ -286,10 +536,10 @@ function displayResults(result, arcgisMapElement) {
 /**
  * Show message when no parking is available
  */
-function showNoResultsMessage() {
+function showNoResultsMessage(message = "All parking lots are currently full. Please try again later.") {
   const panel = document.getElementById("info-panel");
   if (!panel) {
-    console.warn("No available parking found.");
+    console.warn(message);
     return;
   }
 
@@ -298,7 +548,7 @@ function showNoResultsMessage() {
       <calcite-notice open icon="exclamation-mark-triangle" kind="warning">
         <div slot="title">No Parking Available</div>
         <div slot="message">
-          All parking lots are currently full. Please try again later.
+          ${message}
         </div>
       </calcite-notice>
     </calcite-panel>
@@ -378,13 +628,12 @@ function showTurnByTurnDirections(routeInfo, parkingLot) {
   const backBtn = document.getElementById("back-to-summary-btn");
   if (backBtn) {
     backBtn.addEventListener("click", () => {
-      // Re-display the summary with the route info
       const result = {
         lot: parkingLot,
         distance: routeInfo.totalDistance / 3.28084, // convert feet to meters
         distanceInFeet: Math.round(routeInfo.totalDistance)
       };
-      displayResults(result, null, routeInfo);
+      displayResults(result, arcgisMapElementRef);
     });
   }
 

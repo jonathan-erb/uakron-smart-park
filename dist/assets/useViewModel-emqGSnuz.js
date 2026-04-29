@@ -1,0 +1,3 @@
+import{a as r}from"./index-Cd8_p_JB.js";import{p as e}from"./proxyExports-D906TEtL-DiSt6xPd.js";import{A as i}from"./index-DvzxZ9R8.js";import{c as n}from"./useView-zD-kwysE.js";/*! All material copyright Esri, All Rights Reserved, unless otherwise specified.
+See https://js.arcgis.com/4.34/esri/copyright.txt for details.
+v4.34.7 */const u=(s,o)=>t=>c(t,s);class p extends i{#o=void 0;constructor(o,t){super(o,t),new n(this.component)}hostLoad(){this.#o=r(()=>this.component.el.view,o=>{this.instance.view=o,this.instance.map=o?.map},{sync:!0,initial:!0})}hostDestroy(){this.#o?.remove(),super.hostDestroy()}}const c=e(p);export{u as v};

@@ -28,6 +28,11 @@ customElements.whenDefined("arcgis-map").then(() => {
 import { parkingLots, buildings } from "./src/parkingData.js";
 import { createParkingLayer, createBuildingsLayer, addLayersToMap } from "./src/layers.js";
 import { initializeUI } from "./src/ui.js";
+import { ParkingSimulator } from "./src/simulationEngine.js";
+import { initializeSimulatorControls } from "./src/simulatorControls.js";
+
+let currentSimulator = null;
+let currentParkingLayer = null;
 
 function initializeApp() {
   const arcgisMapElement = document.querySelector("arcgis-map");
@@ -49,14 +54,55 @@ function initializeApp() {
     console.log("Map:", arcgisMapElement.map);
     console.log("View:", arcgisMapElement.view);
     console.log("");
-    
+
     console.log("🎯 Loading full parking finder...");
-    
-    const parkingLayer = createParkingLayer(parkingLots);
+
+    currentParkingLayer = createParkingLayer(parkingLots);
     // const buildingsLayer = createBuildingsLayer(buildings);
-    addLayersToMap(arcgisMapElement, [parkingLayer]);
-    
+    addLayersToMap(arcgisMapElement, [currentParkingLayer]);
+
     initializeUI(arcgisMapElement, parkingLots, buildings);
+
+    // Initialize parking simulator
+    console.log("🔄 Initializing parking simulator with time-based occupancy...");
+    currentSimulator = new ParkingSimulator(parkingLots, {
+      updateIntervalMs: 10000, // 1 minute for responsive feedback during dev/testing
+      demoMode: false,
+      noiseStdDev: 0.04,
+      transitionSurgeEnabled: true,
+      transitionSurgeDuration: 10,
+      useScheduleData: true,
+    });
+
+    // When simulator updates, refresh the layer on the map
+    currentSimulator.onUpdate((updatedGeoJSON) => {
+      console.log("📊 Parking occupancy updated");
+      console.log("Sample lot - Lot 24:", {
+        availableSpaces: updatedGeoJSON.features.find(f => f.properties.id === "lot-24")?.properties.availableSpaces,
+        occupancyRate: updatedGeoJSON.features.find(f => f.properties.id === "lot-24")?.properties.occupancyRate,
+      });
+
+      // Remove old layer and add new one
+      if (currentParkingLayer && arcgisMapElement.map) {
+        arcgisMapElement.map.remove(currentParkingLayer);
+      }
+
+      currentParkingLayer = createParkingLayer(updatedGeoJSON);
+      addLayersToMap(arcgisMapElement, [currentParkingLayer]);
+    });
+
+    // Trigger immediate initial update so values aren't static
+    currentSimulator.updateNow();
+
+    // Start the simulation
+    currentSimulator.start();
+    console.log("✅ Parking simulator started (updates every 1 minute)");
+
+    // Initialize simulator controls and log helpful demo commands
+    initializeSimulatorControls();
+
+    // Expose simulator to window for debugging/demo controls
+    window.parkingSimulator = currentSimulator;
 
   });
 }

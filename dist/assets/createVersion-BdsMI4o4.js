@@ -1,0 +1,1 @@
+import{dL as c,dM as f,dN as p,cb as v}from"./index-Cd8_p_JB.js";async function h(a,o,t){const e=c(a),i=o.toJSON(),r=f(e.query,{query:p({...i,f:"json"}),...t,authMode:"immediate",method:"post"}),s=`${e.path}/create`,{data:n}=await v(s,r),{versionName:d,versionGuid:u,...m}=n.versionInfo;return{...m,versionIdentifier:{name:d,guid:u}}}export{h as createVersion};

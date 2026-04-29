@@ -25,23 +25,23 @@ export function distanceCalculationExample() {
     longitude: -81.5105,
     latitude: 41.0745
   });
-  
+
   const parkingLot = new Point({
     longitude: -81.5085,
     latitude: 41.0750
   });
-  
+
   // Calculate distance in meters
   const distanceMeters = geometryEngine.distance(building, parkingLot, "meters");
-  
+
   // Convert to feet
   const distanceFeet = distanceMeters * 3.28084;
-  
+
   console.log("Distance Calculation Example:");
   console.log(`  ${distanceMeters.toFixed(2)} meters`);
   console.log(`  ${distanceFeet.toFixed(2)} feet`);
   console.log(`  ${(distanceFeet / 5280).toFixed(2)} miles`);
-  
+
   return {
     meters: distanceMeters,
     feet: distanceFeet
@@ -54,19 +54,19 @@ export function distanceCalculationExample() {
 export function findNearestExample(targetPoint, pointsArray) {
   let nearestPoint = null;
   let minDistance = Infinity;
-  
+
   pointsArray.forEach(point => {
     const distance = geometryEngine.distance(targetPoint, point, "meters");
-    
+
     if (distance < minDistance) {
       minDistance = distance;
       nearestPoint = point;
     }
   });
-  
+
   console.log("Nearest point found:");
   console.log("  Distance:", minDistance.toFixed(2), "meters");
-  
+
   return {
     point: nearestPoint,
     distance: minDistance

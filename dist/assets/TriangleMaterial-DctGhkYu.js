@@ -1,0 +1,1 @@
+import{s as n}from"./Texture-DW_VPLAG.js";import{h as d,d as m}from"./VertexColor.glsl-BDtv_zhR.js";class f extends n{intersect(e,o,r,t,s,i){return d(e,r,t,s,void 0,i)}intersectDraped(e,o,r,t){return m(r[0],r[1],e,t)}}export{f as i};

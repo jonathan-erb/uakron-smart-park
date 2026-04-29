@@ -1,0 +1,1 @@
+import{dL as p,dM as c,dN as v,cb as $}from"./index-Cd8_p_JB.js";async function I(o,s,e){const n=p(o),r=s.toJSON(),a=c(n.query,{query:v({...r,f:"json"}),...e,authMode:"no-prompt"}),t=`${n.path}/versionInfos`,{data:i}=await $(t,a);return i.versions.map(u=>{const{versionName:d,versionGuid:f,...m}=u;return{...m,versionIdentifier:{name:d,guid:f}}})}export{I as getVersionInfos};

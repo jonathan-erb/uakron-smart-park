@@ -22,7 +22,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 100,
         availableSpaces: 60,
-        permitTypes: ["Student", "Faculty", "Staff", "Visitor"],
+        permitType: "Student/Faculty/Staff/Visitor",
         hourlyRate: 1.00,
         description: "Parking on outer campus"
       }
@@ -39,7 +39,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 90,
         availableSpaces: 55,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -55,8 +55,8 @@ export const parkingLots = {
         name: "Lot 24",
         type: "surface",
         totalSpaces: 150,
-        availableSpaces: 85, // Simulated - replace with real data later
-        permitTypes: ["Student", "Faculty", "Staff", "Commuter", "Overnight"],
+        availableSpaces: 85,
+        permitType: "Student/Faculty/Staff/Commuter/Overnight",
         hourlyRate: 1.00,
         description: "Surface lot - All permit types including overnight commuter parking"
       }
@@ -72,8 +72,8 @@ export const parkingLots = {
         name: "Lot 27",
         type: "surface",
         totalSpaces: 120,
-        availableSpaces: 70, // Simulated - replace with real data later
-        permitTypes: ["Student", "Faculty", "Staff"],
+        availableSpaces: 70,
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -90,7 +90,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 100,
         availableSpaces: 55,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -107,7 +107,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 80,
         availableSpaces: 50,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -124,7 +124,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 100,
         availableSpaces: 60,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -141,7 +141,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 90,
         availableSpaces: 45,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -158,7 +158,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 70,
         availableSpaces: 35,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -175,7 +175,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 85,
         availableSpaces: 50,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -192,7 +192,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 85,
         availableSpaces: 50,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface lot near Folk Hall"
       }
@@ -209,7 +209,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 95,
         availableSpaces: 55,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -226,7 +226,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 75,
         availableSpaces: 40,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -243,7 +243,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 80,
         availableSpaces: 45,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface parking lot"
       }
@@ -259,8 +259,8 @@ export const parkingLots = {
         name: "Lot 36 (South Campus Parking Deck)",
         type: "garage",
         totalSpaces: 450,
-        availableSpaces: 220, // Simulated - replace with real data later
-        permitTypes: ["Student", "Faculty", "Staff", "Visitor"],
+        availableSpaces: 220,
+        permitType: "Student/Faculty/Staff/Visitor",
         hourlyRate: 2.00,
         description: "Multi-level parking deck on south campus"
       }
@@ -277,7 +277,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 25,
         availableSpaces: 10,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface lot near Olin Hall"
       }
@@ -293,8 +293,8 @@ export const parkingLots = {
         name: "Lot 8",
         type: "surface",
         totalSpaces: 80, // Estimate - update with actual capacity
-        availableSpaces: 45, // Simulated - replace with real data later
-        permitTypes: ["Student", "Faculty", "Staff"],
+        availableSpaces: 45,
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Surface lot near Recreation Center and Ocasek Natatorium"
       }
@@ -311,7 +311,7 @@ export const parkingLots = {
         type: "surface",
         totalSpaces: 100,
         availableSpaces: 55,
-        permitTypes: ["Student", "Faculty", "Staff"],
+        permitType: "Student/Faculty/Staff",
         hourlyRate: 1.00,
         description: "Fir-Hill lot near James Rhodes area"
       }
@@ -329,7 +329,7 @@ export const parkingLots = {
     //     type: "garage",
     //     totalSpaces: 450,
     //     availableSpaces: 120,
-    //     permitTypes: ["Student", "Faculty"],
+    //     permitType: ["Student", "Faculty"],
     //     hourlyRate: 2.00,
     //     description: "Multi-level parking deck near student center "
     //   }

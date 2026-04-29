@@ -1,0 +1,3 @@
+import{L as s,c as r,x as i,i as o,l as a}from"./index-Cd8_p_JB.js";import{b as n}from"./component-utils-BRrLzn_d.js";import{p as m}from"./useView-zD-kwysE.js";import"./proxyExports-D906TEtL-DiSt6xPd.js";/*! All material copyright Esri, All Rights Reserved, unless otherwise specified.
+See https://js.arcgis.com/4.34/esri/copyright.txt for details.
+v4.34.7 */const p=o`:host{pointer-events:auto}`,t=class t extends s{constructor(){super(...arguments),this.view=m(this),this.arcgisReady=r()}loaded(){n(this)}render(){return i`<slot></slot>`}};t.properties={position:1,referenceElement:1,view:0},t.styles=p;let e=t;a("arcgis-placement",e);export{e as ArcgisPlacement};

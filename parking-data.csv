@@ -1,0 +1,21 @@
+id,name,type,totalSpaces,availableSpaces,permitType,hourlyRate,description,longitude,latitude
+lot-1,Lot 1,surface,100,60,"Student,Faculty,Staff,Visitor",1.00,Parking on outer campus,-81.50545851532486,41.07590978852686
+lot-4,Lot 4,surface,90,55,"Student,Faculty,Staff",1.00,Surface parking lot,-81.5076615116506,41.07628804817283
+lot-24,Lot 24,surface,150,85,"Student,Faculty,Staff,Commuter,Overnight",1.00,Surface lot - All permit types including overnight commuter parking,-81.51032,41.07828
+lot-27,Lot 27,surface,120,70,"Student,Faculty,Staff",1.00,Surface parking lot,-81.51373003906953,41.078686584819316
+lot-34,Lot 34,surface,100,55,"Student,Faculty,Staff",1.00,Surface parking lot,-81.51633905590212,41.07596513524043
+lot-14,Lot 14,surface,80,50,"Student,Faculty,Staff",1.00,Surface parking lot,-81.5081595864345,41.07788820563801
+lot-3,Lot 3,surface,100,60,"Student,Faculty,Staff",1.00,Surface parking lot,-81.5075957542346,41.07739872678952
+lot-10,Lot 10,surface,90,45,"Student,Faculty,Staff",1.00,Surface parking lot,-81.50690034661366,41.074034050634694
+lot-6,Lot 6,surface,70,35,"Student,Faculty,Staff",1.00,Surface parking lot,-81.5097192974674,41.07273304327922
+lot-9,Lot 9,surface,85,50,"Student,Faculty,Staff",1.00,Surface parking lot,-81.50696428593399,41.07160060144943
+lot-47,Lot 47,surface,85,50,"Student,Faculty,Staff",1.00,Surface lot near Folk Hall,-81.51857998841692,41.073340813759785
+lot-49,Lot 49,garage,1493,55,"Student,Faculty,Staff",1.00,Garage parking lot,-81.51919994439982,41.07760942164629
+lot-46,Lot 46,surface,75,40,"Student,Faculty,Staff",1.00,Surface parking lot,-81.51683373354226,41.07350393577061
+lot-44,Lot 44,surface,80,45,"Student,Faculty,Staff",1.00,Surface parking lot,-81.51616529124898,41.07224923684701
+lot-36,Lot 36 (South Campus Parking Deck),garage,450,220,"Student,Faculty,Staff,Visitor",2.00,Multi-level parking deck on south campus,-81.51465919902684,41.07408193139396
+lot-15,Lot 15,surface,25,10,"Student,Faculty,Staff",1.00,Surface lot near Olin Hall,-81.50796,41.07709
+lot-8,Lot 8,surface,80,45,"Student,Faculty,Staff",1.00,Surface lot near Recreation Center and Ocasek Natatorium,-81.50666,41.07474
+lot-3-fir,Lot 3 (Fir-Hill),surface,100,55,"Student,Faculty,Staff",1.00,Fir-Hill lot near James Rhodes area,-81.50750,41.07556
+lot-north,North Parking Lot,garage,1100,45,Faculty/Staff,3.00,Mainstream parking deck near northern campus buildings,-81.51268936692537,41.07870567073899
+lot-west,Lot 37 (Schrank Hall Parking Deck),garage,150,12,Student,1.00,Parking deck at Schrank Hall,-81.5140,41.0745

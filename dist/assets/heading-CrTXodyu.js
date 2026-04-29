@@ -1,0 +1,3 @@
+import{c as l}from"./index-DDsvgOHr.js";import{s as c,n as m}from"./index-Cd8_p_JB.js";import{s as u,u as $}from"./static-B9xaB8Gy.js";import{e as h}from"./globalCss-D6e49yf7.js";/*! All material copyright Esri, All Rights Reserved, unless otherwise specified.
+See https://js.arcgis.com/4.34/esri/copyright.txt for details.
+v4.34.7 */function x({level:s,class:a,id:e,children:n,excludeGlobalCss:o}){const r=d(s),t=`h${r}`,i=u(t);return $`<${i} .ariaLevel=${String(r)} class=${c(l(o?a:h.heading,a))} id=${e??m} role=heading>${n}</${i}>`}function f(s,a,e){return Math.min(Math.max(s,a),e)}function d(s){return f(Math.ceil(s),1,6)}export{x as v};

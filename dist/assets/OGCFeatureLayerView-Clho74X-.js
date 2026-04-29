@@ -1,0 +1,1 @@
+import{v as a,m as r,b as i}from"./index-Cd8_p_JB.js";const n=t=>{const l=t;let e=class extends l{get availableFields(){return this.layer.fieldsIndex.fields.map(s=>s.name)}};return a([r()],e.prototype,"layer",void 0),a([r({readOnly:!0})],e.prototype,"availableFields",null),e=a([i("esri.views.layers.OGCFeatureLayerView")],e),e};export{n as s};

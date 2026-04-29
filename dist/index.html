@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:;base64,=" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UAkron Smart Park</title>
+    <script type="module" crossorigin src="/assets/index-Cd8_p_JB.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DnyGXufQ.css">
+  </head>
+  <body>
+
+    <calcite-shell>
+      <calcite-navigation slot="header">
+        <calcite-navigation-logo slot="logo"></calcite-navigation-logo>
+      </calcite-navigation>
+
+      <!-- Side Panel for Results -->
+      <calcite-shell-panel slot="panel-start" width-scale="m" id="info-panel" style="display: none;">
+      </calcite-shell-panel>
+
+      <!-- Map -->
+      <arcgis-map
+        basemap="arcgis/navigation"
+        center="-81.5115,41.0736"
+        zoom="16"
+      >
+        <arcgis-zoom position="top-left"></arcgis-zoom>
+        <arcgis-legend position="bottom-right"></arcgis-legend>
+      </arcgis-map>
+
+    </calcite-shell>
+
+  </body>
+</html>

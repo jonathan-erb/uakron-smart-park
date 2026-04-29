@@ -1,0 +1,1 @@
+import{cn as c,cU as i}from"./index-Cd8_p_JB.js";const e=class e{};e.instance=new c("Etc/UTC");let t=e;function s(n){return n instanceof i?n===t.instance:n?.toString().toLowerCase()==="unknown"}function a(n){return s(n)?t.instance:n}export{s as e,a as i,t as o};
